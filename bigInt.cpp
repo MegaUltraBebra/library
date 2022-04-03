@@ -41,15 +41,16 @@ bigInt::bigInt(int n) {
 void bigInt::debug() {
     cout << num;
 }
-string::iterator bigInt::begin(){
+
+string::iterator bigInt::begin() {
     return this->num.begin();
 }
 
-string::iterator bigInt::end(){
+string::iterator bigInt::end() {
     return this->num.end();
 }
 
-int bigInt::length(){
+int bigInt::length() {
     return this->num.length();
 }
 //functions /\ /\ /\
@@ -57,48 +58,105 @@ int bigInt::length(){
 
 
 //operators \/ \/ \/
+bigInt &bigInt::operator-=(const bigInt &b) {
+    *this = *this - b;
+    return *this;
+}
+
+bigInt operator-(bigInt f, bigInt s) {
+    if (!f.is_neg && s.is_neg) {
+        s.is_neg = false;
+        return f + s;
+    }
+    else if (f.is_neg && !s.is_neg) {
+        s.is_neg = true;
+        return f + s;
+    }
+    else{
+
+        if(f.num>s.num) {
+            bigInt *buf = new bigInt;
+            *buf = s;
+            s = f;
+            f = *buf;
+            f.is_neg = true;
+            delete buf;
+        }
+        int buf, cof = f.length() - s.length();
+        for (int i = s.length() - 1; i >= 0; i--) {
+            if (f[i + cof] >= s[i]) f[i + cof] -= (s[i] - 48);
+            else {
+                f[i + cof] -= (s[i] - 48);
+                f[i + cof] += 10;
+                buf = i;
+                while (f[buf - 1 + cof] == '0') {
+                    f[buf - 1 + cof] = '9';
+                    buf--;
+                }
+                f[buf - 1 + cof] -= 1;
+            }
+        }
+        while (f[0] == '0' && f.length()>1) f.num.erase(f.begin());
+        return f;
+    }
+}
+
+bigInt operator-(bigInt b){
+    b.is_neg = !b.is_neg;
+    return b;
+}
+
 bigInt &bigInt::operator+=(const bigInt &b) {
     *this = *this + b;
     return *this;
 }
 
 bigInt operator+(bigInt f, bigInt s) {
-    reverse(f.num.begin(), f.num.end());
-    reverse(s.num.begin(), s.num.end());
-    std::string buf;
-    if (s.num.length() > f.num.length()) {
-        buf = s.num;
-        s.num = f.num;
-        f.num = buf;
-    }
-    for (int i = 0; i < s.num.length(); i++) {
-        if (f.num[i] + s.num[i] - 48 < 58) f.num[i] += s.num[i] - 48;
-        else {
-            f.num[i] += s.num[i] - 58;
-            if (i == f.num.length() - 1) {
-                f.num += '1';
-                continue;
-            }
-            int ii = i + 1;
-            while (f.num[ii] + 1 == 58) {
-                f.num[ii] = '0';
-                if (ii == f.num.length() - 1) {
-                    ii++;
-                    f.num += '0';
-                    break;
-                }
-                ii++;
-            }
-            f.num[ii] += 1;
+    if ((!f.is_neg && !s.is_neg) || (f.is_neg && s.is_neg)) {
+        reverse(f.num.begin(), f.num.end());
+        reverse(s.num.begin(), s.num.end());
+        std::string buf;
+        if (s.num.length() > f.num.length()) {
+            buf = s.num;
+            s.num = f.num;
+            f.num = buf;
         }
+        for (int i = 0; i < s.num.length(); i++) {
+            if (f.num[i] + s.num[i] - 48 < 58) f.num[i] += s.num[i] - 48;
+            else {
+                f.num[i] += s.num[i] - 58;
+                if (i == f.num.length() - 1) {
+                    f.num += '1';
+                    continue;
+                }
+                int ii = i + 1;
+                while (f.num[ii] + 1 == 58) {
+                    f.num[ii] = '0';
+                    if (ii == f.num.length() - 1) {
+                        ii++;
+                        f.num += '0';
+                        break;
+                    }
+                    ii++;
+                }
+                f.num[ii] += 1;
+            }
+        }
+        reverse(f.num.begin(), f.num.end());
+        return f;
     }
-    reverse(f.num.begin(), f.num.end());
-
-    return f;
+    if (f.is_neg && !s.is_neg) {
+        f.is_neg = false;
+        return s - f;
+    }
+    else if (!f.is_neg && s.is_neg) {
+        s.is_neg = false;
+        return f - s;
+    }
 }
 
 bigInt &bigInt::operator*=(const bigInt &b) {
-    *this = *this*b;
+    *this = *this * b;
     return *this;
 }
 
@@ -125,6 +183,23 @@ bigInt operator*(bigInt f, bigInt s) {
     return res;
 }
 
+bigInt& bigInt::operator/=(const bigInt &b){
+    *this = *this / b;
+    return *this;
+}
+
+bigInt operator/(bigInt f, bigInt s){
+    if(f.num<s.num) return bigInt(0);
+    bigInt res;
+
+
+
+    if (s.is_neg && !f.is_neg) res.is_neg = true;
+    else if (s.is_neg && f.is_neg) res.is_neg = false;
+    return res;
+
+}
+
 
 ostream &operator<<(ostream &out, const bigInt &var) {
     if (var.is_neg) out << '-';
@@ -141,7 +216,7 @@ istream &operator>>(istream &in, bigInt &var) {
     return in;
 }
 
-char bigInt::operator[](int pos){
+char &bigInt::operator[](int pos) {
     return this->num[pos];
 }
 

@@ -19,6 +19,12 @@ public:
 
     //bigInt(size_t s);
 
+    bigInt &operator-=(const bigInt &b);
+
+    friend bigInt operator-(bigInt f, bigInt s);
+
+    friend bigInt operator-(bigInt b);
+
     bigInt &operator+=(const bigInt &buf);
 
     friend bigInt operator+(bigInt f, bigInt s);
@@ -27,11 +33,15 @@ public:
 
     friend bigInt operator*(bigInt f, bigInt s);
 
+    bigInt& operator/=(const bigInt &b);
+
+    friend bigInt operator/(bigInt f, bigInt s);
+
     friend std::ostream &operator<<(std::ostream &out, const bigInt &var);
 
     friend std::istream &operator>>(std::istream &in, bigInt &var);
 
-    char operator[](int pos);
+    char &operator[](int pos);
 
     friend bool operator==(bigInt &f, bigInt &s);
 
