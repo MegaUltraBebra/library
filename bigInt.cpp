@@ -29,10 +29,16 @@ bigInt::bigInt(int n) {
     is_neg = false;
     if (s[0] == '-') {
         s.erase(s.begin());
-        num = s;
         is_neg = true;
     }
+    num = s;
 }
+
+/*bigInt::bigInt(std::basic_string<char> s) {
+    (s[0] == '-' ? is_neg = true : is_neg = false);
+    num = s;
+    if (is_neg) num.erase(num.begin());
+}*/
 //constructors /\ /\ /\
 
 
@@ -67,14 +73,12 @@ bigInt operator-(bigInt f, bigInt s) {
     if (!f.is_neg && s.is_neg) {
         s.is_neg = false;
         return f + s;
-    }
-    else if (f.is_neg && !s.is_neg) {
+    } else if (f.is_neg && !s.is_neg) {
         s.is_neg = true;
         return f + s;
-    }
-    else{
+    } else {
 
-        if(f.num>s.num) {
+        if (f.num > s.num) {
             bigInt *buf = new bigInt;
             *buf = s;
             s = f;
@@ -96,12 +100,12 @@ bigInt operator-(bigInt f, bigInt s) {
                 f[buf - 1 + cof] -= 1;
             }
         }
-        while (f[0] == '0' && f.length()>1) f.num.erase(f.begin());
+        while (f[0] == '0' && f.length() > 1) f.num.erase(f.begin());
         return f;
     }
 }
 
-bigInt operator-(bigInt b){
+bigInt operator-(bigInt b) {
     b.is_neg = !b.is_neg;
     return b;
 }
@@ -112,47 +116,46 @@ bigInt &bigInt::operator+=(const bigInt &b) {
 }
 
 bigInt operator+(bigInt f, bigInt s) {
-    if ((!f.is_neg && !s.is_neg) || (f.is_neg && s.is_neg)) {
-        reverse(f.num.begin(), f.num.end());
-        reverse(s.num.begin(), s.num.end());
-        std::string buf;
-        if (s.num.length() > f.num.length()) {
-            buf = s.num;
-            s.num = f.num;
-            f.num = buf;
-        }
-        for (int i = 0; i < s.num.length(); i++) {
-            if (f.num[i] + s.num[i] - 48 < 58) f.num[i] += s.num[i] - 48;
-            else {
-                f.num[i] += s.num[i] - 58;
-                if (i == f.num.length() - 1) {
-                    f.num += '1';
-                    continue;
-                }
-                int ii = i + 1;
-                while (f.num[ii] + 1 == 58) {
-                    f.num[ii] = '0';
-                    if (ii == f.num.length() - 1) {
-                        ii++;
-                        f.num += '0';
-                        break;
-                    }
-                    ii++;
-                }
-                f.num[ii] += 1;
-            }
-        }
-        reverse(f.num.begin(), f.num.end());
-        return f;
-    }
     if (f.is_neg && !s.is_neg) {
         f.is_neg = false;
         return s - f;
-    }
-    else if (!f.is_neg && s.is_neg) {
+    } else if (!f.is_neg && s.is_neg) {
         s.is_neg = false;
         return f - s;
     }
+    reverse(f.num.begin(), f.num.end());
+    reverse(s.num.begin(), s.num.end());
+    std::string buf;
+    if (s.num.length() > f.num.length()) {
+        buf = s.num;
+        s.num = f.num;
+        f.num = buf;
+    }
+    for (int i = 0; i < s.num.length(); i++) {
+        if (f.num[i] + s.num[i] - 48 < 58) f.num[i] += s.num[i] - 48;
+        else {
+            f.num[i] += s.num[i] - 58;
+            if (i == f.num.length() - 1) {
+                f.num += '1';
+                continue;
+            }
+            int ii = i + 1;
+            while (f.num[ii] + 1 == 58) {
+                f.num[ii] = '0';
+                if (ii == f.num.length() - 1) {
+                    ii++;
+                    f.num += '0';
+                    break;
+                }
+                ii++;
+            }
+            f.num[ii] += 1;
+        }
+    }
+    reverse(f.num.begin(), f.num.end());
+    return f;
+
+
 }
 
 bigInt &bigInt::operator*=(const bigInt &b) {
@@ -183,20 +186,42 @@ bigInt operator*(bigInt f, bigInt s) {
     return res;
 }
 
-bigInt& bigInt::operator/=(const bigInt &b){
+bigInt &bigInt::operator/=(const bigInt &b) {
     *this = *this / b;
     return *this;
 }
 
-bigInt operator/(bigInt f, bigInt s){
-    if(f.num<s.num) return bigInt(0);
-    bigInt res;
+bigInt operator/(bigInt f, bigInt s) {
+    if (stoi(f.num) < stoi(s.num)) { return bigInt(0); }
+    string res;
+    if (s.is_neg ^ f.is_neg) res += '-';
+    string buf;
 
-
-
-    if (s.is_neg && !f.is_neg) res.is_neg = true;
-    else if (s.is_neg && f.is_neg) res.is_neg = false;
-    return res;
+    if (stoi((f.num.substr(0, s.length()))) < stoi(s.num)) {
+        buf = f.num.substr(0, s.length() + 1);
+        f.num.erase(0, s.length() + 1);
+    } else {
+        buf = f.num.substr(0, s.length());
+        f.num.erase(0, s.length());
+    }
+    s.is_neg = false;
+    char i;
+    bigInt temp;
+    while (stoi(buf) > stoi(s.num)) {
+        i = '0';
+        temp = bigInt(0);
+        while (stoi(buf) >= stoi((temp + s).num)) {
+            temp += s;
+            i++;
+        }
+        res += i;
+        buf = to_string(stoi(buf) - stoi(temp.num));
+        if (!f.num.empty()) {
+            buf += f[0];
+            f.num.erase((f.begin()));
+        }
+    }
+    return bigInt(res);
 
 }
 
@@ -216,47 +241,49 @@ istream &operator>>(istream &in, bigInt &var) {
     return in;
 }
 
+//bigInt& bigInt::operator=(string& b){*this = bigInt(b);return *this;}
+
 char &bigInt::operator[](int pos) {
     return this->num[pos];
 }
 
-bool operator==(bigInt &f, bigInt &s) {
+bool operator==(bigInt f, bigInt s) {
     if (f.is_neg == s.is_neg && f.num == s.num) return true;
     return false;
 }
 
-bool operator!=(bigInt &f, bigInt &s) {
+bool operator!=(bigInt f, bigInt s) {
     if (f.is_neg != s.is_neg || f.num != s.num) return true;
     return false;
 }
 
-bool operator<(bigInt &f, bigInt &s) {
+bool operator<(bigInt f, bigInt s) {
     if (f.is_neg && !s.is_neg) return true;
-    else if (f.is_neg && s.is_neg) return f.num > s.num;
-    else if (!f.is_neg && !s.is_neg) return f.num < s.num;
+    else if (f.is_neg && s.is_neg) return stoi(f.num) > stoi(s.num);
+    else if (!f.is_neg && !s.is_neg) return stoi(f.num) < stoi(s.num);
     return false;
 }
 
-bool operator>(bigInt &f, bigInt &s) {
+bool operator>(bigInt f, bigInt s) {
     if (!f.is_neg && s.is_neg) return true;
-    else if (f.is_neg && s.is_neg) return f.num < s.num;
-    else if (!f.is_neg && !s.is_neg) return f.num > s.num;
+    else if (f.is_neg && s.is_neg) return stoi(f.num) < stoi(s.num);
+    else if (!f.is_neg && !s.is_neg) return stoi(f.num) > stoi(s.num);
     return false;
 }
 
-bool operator<=(bigInt &f, bigInt &s) {
+bool operator<=(bigInt f, bigInt s) {
     if (f == s) return true;
     if (f.is_neg && !s.is_neg) return true;
-    else if (f.is_neg && s.is_neg) return f.num > s.num;
-    else if (!f.is_neg && !s.is_neg) return f.num < s.num;
+    else if (f.is_neg && s.is_neg) return stoi(f.num) > stoi(s.num);
+    else if (!f.is_neg && !s.is_neg) return stoi(f.num) < stoi(s.num);
     return false;
 }
 
-bool operator>=(bigInt &f, bigInt &s) {
+bool operator>=(bigInt f, bigInt s) {
     if (f == s) return true;
     if (!f.is_neg && s.is_neg) return true;
-    else if (f.is_neg && s.is_neg) return f.num < s.num;
-    else if (!f.is_neg && !s.is_neg) return f.num > s.num;
+    else if (f.is_neg && s.is_neg) return stoi(f.num) < stoi(s.num);
+    else if (!f.is_neg && !s.is_neg) return stoi(f.num) > stoi(s.num);
     return false;
 }
 //operators /\ /\ /\

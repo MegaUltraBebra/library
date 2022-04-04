@@ -6,6 +6,7 @@
 
 class bigInt {
 private:
+
     std::string num;
     bool is_neg;
 public:
@@ -16,6 +17,10 @@ public:
     explicit bigInt(const char *s);
 
     explicit bigInt(int n);
+
+    //bigInt(std::basic_string<char> basicString);
+
+    //bigInt& operator=(std::string& b);
 
     //bigInt(size_t s);
 
@@ -43,17 +48,17 @@ public:
 
     char &operator[](int pos);
 
-    friend bool operator==(bigInt &f, bigInt &s);
+    friend bool operator==(bigInt f, bigInt s);
 
-    friend bool operator!=(bigInt &f, bigInt &s);
+    friend bool operator!=(bigInt f, bigInt s);
 
-    friend bool operator<(bigInt &f, bigInt &s);
+    friend bool operator<(bigInt f, bigInt s);
 
-    friend bool operator>(bigInt &f, bigInt &s);
+    friend bool operator>(bigInt f, bigInt s);
 
-    friend bool operator<=(bigInt &f, bigInt &s);
+    friend bool operator<=(bigInt f, bigInt s);
 
-    friend bool operator>=(bigInt &f, bigInt &s);
+    friend bool operator>=(bigInt f, bigInt s);
 
     void debug();
 
