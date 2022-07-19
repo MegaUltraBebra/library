@@ -192,7 +192,11 @@ bigInt &bigInt::operator/=(const bigInt &b) {
 }
 
 bigInt operator/(bigInt f, bigInt s) {
-    if (stoi(f.num) < stoi(s.num)) { return bigInt(0); }
+    //if (stoi(f.num) < stoi(s.num)) { return bigInt(0); } почему((
+    if(s.num == "0"){
+        cerr<<endl<<"Fuck you";
+        return bigInt("-0");
+    }
     string res;
     if (s.is_neg ^ f.is_neg) res += '-';
     string buf;
@@ -207,7 +211,7 @@ bigInt operator/(bigInt f, bigInt s) {
     s.is_neg = false;
     char i;
     bigInt temp;
-    while (stoi(buf) > stoi(s.num)) {
+    while (stoi(buf) >= stoi(s.num) || (stoi(buf) == 0 && buf.size()>1)) {
         i = '0';
         temp = bigInt(0);
         while (stoi(buf) >= stoi((temp + s).num)) {

@@ -1,5 +1,6 @@
 #include <vector>
 #include<string>
+#include<utility>
 
 #ifndef UNTITLED2_LIBRARY_H
 #define UNTITLED2_LIBRARY_H
@@ -38,7 +39,7 @@ public:
 
     friend bigInt operator*(bigInt f, bigInt s);
 
-    bigInt& operator/=(const bigInt &b);
+    bigInt &operator/=(const bigInt &b);
 
     friend bigInt operator/(bigInt f, bigInt s);
 
@@ -80,5 +81,9 @@ std::string to_anyone(long long int num, int c);
 std::vector<std::string> permutations(std::string s);
 
 int to_int(const std::string &str);
+
+std::vector<std::pair<int, int>>
+lee(const std::pair<int, int> start, const std::pair<int, int> end, std::vector<std::vector<int>> &field, int WALL = -1,
+    int SPACE = 0);
 
 #endif //UNTITLED2_LIBRARY_H
